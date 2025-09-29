@@ -12,7 +12,11 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\""
   },
-  "keywords": ["twitter", "length", "validation"],
+  "keywords": [
+    "twitter",
+    "length",
+    "validation"
+  ],
   "author": "Kamal Eddin",
   "license": "MIT",
   "dependencies": {
@@ -24,6 +28,7 @@
     "@types/jest": "^29.5.11",
     "@types/node": "^20.10.6",
     "@types/supertest": "^6.0.2",
+    "@types/twitter-text": "^3.1.10",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
     "eslint": "^8.56.0",
