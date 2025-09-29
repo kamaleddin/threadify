@@ -221,7 +221,7 @@ Acceptance:
 - 100% coverage on crypto module; tests pass. ✅
 ```
 
-### Prompt 04 — Node length service (twitter-text) + Python client
+### Prompt 04 — Node length service (twitter-text) + Python client ✅ COMPLETED
 
 ```text
 Implement Prompt 04: Official tweet length checks.
@@ -237,8 +237,8 @@ Scope:
 4) Contract test: spin up ephemeral node server (or mock) and assert client mapping.
 
 Acceptance:
-- `pnpm test` passing with meaningful cases.
-- Python unit tests for client pass; failure mode handled (service down -> raises).
+- `pnpm test` passing with meaningful cases. ✅
+- Python unit tests for client pass; failure mode handled (service down -> raises). ✅
 ```
 
 ### Prompt 05 — Canonicalizer
