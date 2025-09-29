@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # FastAPI backend (placeholder - will be expanded)
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    container_name: threadify-api
+    environment:
+      - APP_ENV=${APP_ENV:-development}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./data/threadify.db}
+      - SECRET_AES_KEY=${SECRET_AES_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LENGTH_SERVICE_URL=http://length:8080
+    volumes:
+      - ../data:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      - length
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+  # Node.js length service (placeholder - will be expanded)
+  length:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.node
+    container_name: threadify-length
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+  # Caddy reverse proxy (placeholder - will be configured in Prompt 18)
+  # caddy:
+  #   build:
+  #     context: ..
+  #     dockerfile: deploy/Dockerfile.caddy
+  #   container_name: threadify-caddy
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - caddy_data:/data
+  #     - caddy_config:/config
+  #   depends_on:
+  #     - api
+  #   restart: unless-stopped
+
+  # Watchtower for auto-updates (optional)
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: threadify-watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --interval 300 --cleanup
+  #   restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
