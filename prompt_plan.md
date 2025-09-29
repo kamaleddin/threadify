@@ -201,7 +201,7 @@ Acceptance:
 - All tests pass; alembic revision created; `poetry run alembic upgrade head` works. ✅
 ```
 
-### Prompt 03 — AES-GCM crypto for secrets
+### Prompt 03 — AES-GCM crypto for secrets ✅ COMPLETED
 
 ```text
 Implement Prompt 03: AES-GCM utilities for sealing tokens at rest.
@@ -218,7 +218,7 @@ Tests first:
 - backend/tests/test_account_secrets.py: setting token stores ciphertext; reading returns original via helper.
 
 Acceptance:
-- 100% coverage on crypto module; tests pass.
+- 100% coverage on crypto module; tests pass. ✅
 ```
 
 ### Prompt 04 — Node length service (twitter-text) + Python client
