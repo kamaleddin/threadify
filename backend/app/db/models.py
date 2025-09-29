@@ -3,9 +3,12 @@
 from datetime import datetime
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.config import get_settings
 from app.db.base import Base
+from app.security.crypto import seal, unseal
 
 
 class Account(Base):
@@ -28,6 +31,55 @@ class Account(Base):
 
     # Relationships
     runs: Mapped[list["Run"]] = relationship("Run", back_populates="account")
+
+    # Hybrid properties for transparent encryption/decryption
+    def _get_encryption_key(self) -> bytes:
+        """Get the encryption key from settings (base64-decoded)."""
+        import base64
+
+        settings = get_settings()
+        if settings.secret_aes_key is None:
+            raise ValueError("SECRET_AES_KEY not configured")
+        # Key is stored as base64url-encoded string, decode it to bytes
+        return base64.urlsafe_b64decode(settings.secret_aes_key)
+
+    @hybrid_property
+    def access_token(self) -> str | None:
+        """Get decrypted access token."""
+        if self.token_encrypted is None:
+            return None
+        key = self._get_encryption_key()
+        decrypted = unseal(self.token_encrypted, key)
+        return decrypted.decode("utf-8")
+
+    @access_token.setter  # type: ignore[no-redef]
+    def access_token(self, value: str | None) -> None:
+        """Set access token (will be encrypted)."""
+        if value is None:
+            self.token_encrypted = None
+            return
+        key = self._get_encryption_key()
+        encrypted = seal(value.encode("utf-8"), key)
+        self.token_encrypted = encrypted
+
+    @hybrid_property
+    def refresh_token(self) -> str | None:
+        """Get decrypted refresh token."""
+        if self.refresh_encrypted is None:
+            return None
+        key = self._get_encryption_key()
+        decrypted = unseal(self.refresh_encrypted, key)
+        return decrypted.decode("utf-8")
+
+    @refresh_token.setter  # type: ignore[no-redef]
+    def refresh_token(self, value: str | None) -> None:
+        """Set refresh token (will be encrypted)."""
+        if value is None:
+            self.refresh_encrypted = None
+            return
+        key = self._get_encryption_key()
+        encrypted = seal(value.encode("utf-8"), key)
+        self.refresh_encrypted = encrypted
 
 
 class Run(Base):
