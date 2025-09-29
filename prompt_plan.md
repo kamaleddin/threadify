@@ -143,7 +143,7 @@ threadify/
 
 Each prompt is standalone, incremental, test-first, and references files to create/modify. Run them **in order**.
 
-### Prompt 01 — Repo scaffold, tooling, CI
+### Prompt 01 — Repo scaffold, tooling, CI ✅ COMPLETED
 
 ```text
 You are implementing Prompt 01 for the Threadify MVP.
@@ -172,9 +172,9 @@ Tests first:
 - Write `node-helpers/length-service/test/index.test.ts` with a trivial placeholder test.
 
 Acceptance:
-- `pytest -q` passes.
-- `pnpm -C node-helpers/length-service test` passes.
-- CI workflow green on push.
+- `pytest -q` passes. ✅
+- `pnpm -C node-helpers/length-service test` passes. ✅
+- CI workflow green on push. ✅
 ```
 
 ### Prompt 02 — DB engine, base models, migrations
