@@ -177,7 +177,7 @@ Acceptance:
 - CI workflow green on push. ✅
 ```
 
-### Prompt 02 — DB engine, base models, migrations
+### Prompt 02 — DB engine, base models, migrations ✅ COMPLETED
 
 ```text
 Implement Prompt 02: SQLAlchemy and Alembic setup.
@@ -198,7 +198,7 @@ Tests first:
 - backend/tests/test_migrations.py: run alembic upgrade head against fresh DB.
 
 Acceptance:
-- All tests pass; alembic revision created; `poetry run alembic upgrade head` works.
+- All tests pass; alembic revision created; `poetry run alembic upgrade head` works. ✅
 ```
 
 ### Prompt 03 — AES-GCM crypto for secrets
