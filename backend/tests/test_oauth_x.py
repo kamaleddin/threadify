@@ -118,7 +118,10 @@ def test_start_oauth_flow(monkeypatch: pytest.MonkeyPatch) -> None:
 
     # Verify scopes (URL-encoded as '+' or '%20')
     for scope in REQUIRED_SCOPES:
-        assert scope.replace(".", "%2E") in result.authorization_url or scope in result.authorization_url
+        assert (
+            scope.replace(".", "%2E") in result.authorization_url
+            or scope in result.authorization_url
+        )
 
 
 def test_start_oauth_flow_missing_client_id() -> None:

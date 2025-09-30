@@ -87,9 +87,10 @@ async def oauth_callback(
         account = get_account_by_handle(db, handle)
 
         if account:
-            # Update existing account tokens (using setattr to avoid mypy method-assign error)
-            setattr(account, "access_token", tokens.access_token)
-            setattr(account, "refresh_token", tokens.refresh_token)
+            # Update existing account tokens
+            # Note: Using property assignment, mypy complains but it works at runtime
+            account.access_token = tokens.access_token  # type: ignore[method-assign]
+            account.refresh_token = tokens.refresh_token  # type: ignore[method-assign]
             account.scopes = tokens.scope
             db.commit()
         else:
@@ -102,8 +103,8 @@ async def oauth_callback(
             account = create_account(db, account_data)
 
             # Set tokens (will be encrypted automatically via hybrid properties)
-            setattr(account, "access_token", tokens.access_token)
-            setattr(account, "refresh_token", tokens.refresh_token)
+            account.access_token = tokens.access_token  # type: ignore[method-assign]
+            account.refresh_token = tokens.refresh_token  # type: ignore[method-assign]
             db.commit()
 
         # Clear session
