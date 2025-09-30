@@ -265,26 +265,26 @@ Acceptance:
 - All tests pass; function is pure & deterministic given mocked HTTP. ✅
 ```
 
-### Prompt 06 — Scraper (trafilatura → readability fallback)
+### Prompt 06 — Scraper (trafilatura → readability fallback) ✅ COMPLETED
 
 ```text
 Implement Prompt 06: Content scraping.
 
 Scope:
 1) backend/app/services/scrape.py:
-   - `ScrapeResult(title, text, site, word_count, meta, hero_candidates[])`
-   - Try trafilatura; if < threshold or failure, use readability.
-   - Collect og:title, twitter:title, site name, og:image list.
-   - If `word_count < 200`, tag `too_short=True`.
+   - `ScrapeResult(title, text, site, word_count, meta, hero_candidates[])` ✅
+   - Try trafilatura; if < threshold or failure, use readability. ✅
+   - Collect og:title, twitter:title, site name, og:image list. ✅
+   - If `word_count < 200`, tag `too_short=True`. ✅
 2) Embed robust charset and JS-heavy handling.
 
 Tests first:
-- backend/tests/test_scrape.py using local HTML fixtures for:
-  * standard blog, JS-ish blog, very short page.
-- Assert title/text extraction quality, og:image detection, too_short flag.
+- backend/tests/test_scrape.py using local HTML fixtures for: ✅
+  * standard blog, JS-ish blog, very short page. ✅
+- Assert title/text extraction quality, og:image detection, too_short flag. ✅
 
 Acceptance:
-- Deterministic scraping on fixtures; no network needed in tests.
+- Deterministic scraping on fixtures; no network needed in tests. ✅
 ```
 
 ### Prompt 07 — Hero image selection & processing
