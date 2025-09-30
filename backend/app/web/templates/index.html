@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Threadify - Convert Blog to Thread{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Convert Blog to X/Twitter Thread</h2>
+
+    <form method="POST" action="/submit" class="submission-form">
+        <div class="form-section">
+            <h3>Basic Settings</h3>
+
+            <div class="form-group">
+                <label for="url">Blog URL *</label>
+                <input type="url" id="url" name="url" required
+                       placeholder="https://example.com/blog-post">
+            </div>
+
+            <div class="form-group">
+                <label for="account_id">Target Account *</label>
+                <select id="account_id" name="account_id" required>
+                    <option value="">-- Select Account --</option>
+                    {% for account in accounts %}
+                    <option value="{{ account.id }}">@{{ account.handle }}</option>
+                    {% endfor %}
+                </select>
+                <small><a href="/oauth/x/start">+ Connect new account</a></small>
+            </div>
+
+            <div class="form-group">
+                <label for="mode">Post Mode</label>
+                <select id="mode" name="mode">
+                    <option value="review" selected>Review (default)</option>
+                    <option value="auto">Auto-post</option>
+                </select>
+                <small>Review mode lets you edit before posting</small>
+            </div>
+
+            <div class="form-group">
+                <label for="type">Output Type</label>
+                <select id="type" name="type">
+                    <option value="thread" selected>Thread</option>
+                    <option value="single">Single Post</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="style">Style Profile</label>
+                <select id="style" name="style">
+                    <option value="neutral">Neutral Summarizer</option>
+                    <option value="punchy" selected>Punchy Explainer</option>
+                    <option value="expert">Expert Analyst</option>
+                    <option value="data">Data-Driven Pragmatist</option>
+                    <option value="narrative">Narrative Threader</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="summary_mode">Summary Mode</label>
+                <select id="summary_mode" name="summary_mode">
+                    <option value="extractive" selected>Extractive (default)</option>
+                    <option value="commentary">Light Commentary</option>
+                </select>
+            </div>
+        </div>
+
+        <details class="form-section">
+            <summary><h3>Advanced Options</h3></summary>
+
+            <div class="form-group">
+                <label for="thread_cap">Thread Cap (max tweets)</label>
+                <input type="number" id="thread_cap" name="thread_cap"
+                       value="12" min="2" max="20">
+                <small>Default: 12, Hard limit: 20</small>
+            </div>
+
+            <div class="form-group">
+                <label for="single_cap">Single Post Cap (characters)</label>
+                <input type="number" id="single_cap" name="single_cap"
+                       value="1400" min="280" max="25000">
+                <small>Default: 1400, Longform max: 25000</small>
+            </div>
+
+            <div class="form-group checkbox">
+                <input type="checkbox" id="include_reference" name="include_reference" checked>
+                <label for="include_reference">Include Reference (attribution reply)</label>
+            </div>
+
+            <div class="form-group">
+                <label for="utm_campaign">UTM Campaign</label>
+                <input type="text" id="utm_campaign" name="utm_campaign"
+                       value="threadify" placeholder="threadify">
+                <small>Used in reference link tracking</small>
+            </div>
+
+            <div class="form-group checkbox">
+                <input type="checkbox" id="include_image" name="include_image" checked>
+                <label for="include_image">Include Hero Image</label>
+            </div>
+
+            <div class="form-group checkbox">
+                <input type="checkbox" id="include_hook" name="include_hook" checked>
+                <label for="include_hook">Include Hook (for threads)</label>
+            </div>
+
+            <div class="form-group checkbox">
+                <input type="checkbox" id="force" name="force">
+                <label for="force">Force (override duplicate detection)</label>
+            </div>
+        </details>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Generate Thread
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
