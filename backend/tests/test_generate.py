@@ -403,3 +403,22 @@ def test_extractive_vs_summarize_prompts(sample_scrape: ScrapeResult) -> None:
     assert "ONLY the author's own words" in extractive_prompt
     assert "ONLY the author's own words" not in summarize_prompt
     assert "Summarize and distill" in summarize_prompt
+
+
+def test_generate_with_budget_check(sample_scrape: ScrapeResult, mock_openai_thread) -> None:
+    """Test generation with budget validation (integration with budget service)."""
+    from app.services.budget import within_budget
+    from app.services.generate import estimate_cost
+
+    settings = GenerationSettings(mode="thread")
+    prompt = build_thread_prompt(sample_scrape, settings)
+
+    # Estimate cost for the prompt
+    cost_estimate = estimate_cost(prompt, expected_output_tokens=150, model="gpt-4o-mini")
+
+    # Verify estimate is within budget
+    assert within_budget(cost_estimate, cap_usd=0.02) is True
+
+    # Now generate (should succeed because it's within budget)
+    result = generate_thread(sample_scrape, settings, openai_client=mock_openai_thread)
+    assert result.cost_usd > 0
