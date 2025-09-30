@@ -1,0 +1,471 @@
+# Threadify Project Rules
+
+## Project Overview
+Threadify is a Python/TypeScript application that converts blog URLs into Twitter/X threads using AI.
+- **Backend**: FastAPI (Python 3.11+) with SQLite
+- **Node Service**: Express.js for tweet length validation
+- **Architecture**: Microservices with HTTP communication
+- **Deployment**: Docker Compose with Caddy reverse proxy
+
+## Code Style & Formatting
+
+### Python
+- **Formatter**: Black (line length: 100)
+- **Linter**: Ruff (pycodestyle, pyflakes, isort, flake8-bugbear, comprehensions, pyupgrade)
+- **Type Checker**: Mypy (strict mode enabled)
+- **Python Version**: 3.11+
+
+#### Python Style Rules
+1. Use type hints on all function signatures
+2. Use `str | None` instead of `Optional[str]` (Python 3.10+ style)
+3. Use `from collections.abc import Callable` instead of `from typing import Callable`
+4. Import order: stdlib, third-party, local (enforced by ruff/isort)
+5. Docstrings required for all public functions/classes (Google style)
+6. Line length: 100 characters maximum
+7. Use dataclasses for simple data structures
+8. Use Pydantic models for API schemas and validation
+
+#### Type Checking Notes
+- Add `# type: ignore[specific-error]` comments when needed (e.g., PIL Image types)
+- Never use bare `# type: ignore` - always specify the error code
+- Prefer fixing types over ignoring them when possible
+
+### TypeScript/JavaScript
+- **Formatter**: Prettier
+- **Linter**: ESLint with TypeScript plugin
+- **Node Version**: 20.x
+- **Package Manager**: pnpm
+
+#### TypeScript Style Rules
+1. Use TypeScript strict mode
+2. Prefer interfaces over types for object shapes
+3. Use async/await over promises
+4. Export types/interfaces explicitly
+
+## Project Structure
+
+```
+threadify/
+├── backend/                    # Python FastAPI backend
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py            # FastAPI app entry point
+│   │   ├── config.py          # Pydantic settings (BaseSettings)
+│   │   ├── clients/           # HTTP clients for external services
+│   │   ├── db/                # Database layer
+│   │   │   ├── base.py        # SQLAlchemy engine, session, Base
+│   │   │   ├── models.py      # ORM models
+│   │   │   ├── schema.py      # Pydantic schemas
+│   │   │   ├── dao.py         # Data access objects
+│   │   │   └── migrations/    # Alembic migrations
+│   │   ├── security/          # Cryptography, auth
+│   │   └── services/          # Business logic
+│   │       ├── canonicalize.py  # URL canonicalization
+│   │       ├── scraper.py       # Web content scraping
+│   │       └── images.py        # Image processing
+│   └── tests/                 # Pytest tests
+│       ├── conftest.py        # Shared fixtures
+│       └── test_*.py          # Test files
+│
+├── node-helpers/
+│   └── length-service/        # Tweet length validation service
+│       ├── src/
+│       │   └── index.ts       # Express server
+│       ├── test/
+│       │   └── index.test.ts  # Jest tests
+│       └── package.json
+│
+├── deploy/
+│   ├── docker-compose.yml     # Multi-service deployment
+│   ├── Dockerfile.api         # Backend container
+│   ├── Dockerfile.node        # Node service container
+│   └── env.example            # Environment variables template
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml             # GitHub Actions CI
+│
+├── pyproject.toml             # Poetry config, tool settings
+├── alembic.ini                # Alembic migration config
+├── .cursorrules               # This file
+├── prompt_plan.md             # TDD implementation roadmap
+├── spec.md                    # Product specification
+└── todo.md                    # Task checklist
+```
+
+## Testing Requirements
+
+### Test-Driven Development (TDD)
+1. **Write tests FIRST** before implementing features
+2. Use descriptive test names: `test_function_name_scenario_expected_result`
+3. Follow Arrange-Act-Assert pattern
+4. Use fixtures for common setup
+5. Mock external dependencies (HTTP, file system, etc.)
+
+### Python Testing
+- **Framework**: Pytest
+- **Coverage Target**: >90%
+- **Coverage Tool**: pytest-cov
+- **Async Support**: pytest-asyncio
+
+#### Test Organization
+```python
+# tests/conftest.py - Shared fixtures
+@pytest.fixture
+def db_session():
+    """Isolated database session for testing."""
+    # Setup in-memory SQLite or temp file
+    # Yield session
+    # Cleanup
+
+# tests/test_module.py - Test file
+def test_function_with_valid_input(fixture_name):
+    """Test that function handles valid input correctly."""
+    # Arrange
+    input_data = create_test_data()
+    
+    # Act
+    result = function_under_test(input_data)
+    
+    # Assert
+    assert result.property == expected_value
+```
+
+#### Test Requirements
+- Use in-memory SQLite (`:memory:`) or temp files for DB tests
+- Use `monkeypatch` for environment variables
+- Mock HTTP calls with injectable `http_get` parameters
+- Create test fixtures (HTML, images) programmatically, not from files
+- Never make real network calls in tests
+- Use parametrize for testing multiple scenarios
+
+### Node/TypeScript Testing
+- **Framework**: Jest
+- **Test Files**: `*.test.ts`
+- **Mock HTTP**: supertest
+
+### Running Tests Locally
+```bash
+# Python tests
+poetry run pytest -v                    # All tests
+poetry run pytest --cov=backend/app     # With coverage
+poetry run pytest path/to/test_file.py  # Specific file
+
+# Node tests
+cd node-helpers/length-service
+pnpm test
+```
+
+## GitHub Actions CI
+
+### Required Checks
+All PRs and commits must pass these checks:
+
+#### Python Checks
+1. **Ruff linting**: `poetry run ruff check backend/`
+2. **Black formatting**: `poetry run black --check backend/`
+3. **Mypy type checking**: `poetry run mypy backend/app`
+4. **Pytest**: `poetry run pytest --cov=backend/app --cov-report=xml`
+
+#### Node Checks
+1. **Jest tests**: `pnpm test`
+
+### Pre-Push Checklist
+Before pushing code, run locally:
+```bash
+# Python
+poetry run ruff check backend/ --fix
+poetry run black backend/
+poetry run mypy backend/app
+poetry run pytest -v
+
+# Node
+cd node-helpers/length-service && pnpm test
+```
+
+### Common CI Failures & Fixes
+
+#### Whitespace Issues
+- **Error**: `W293 Blank line contains whitespace`
+- **Fix**: `poetry run ruff check --fix --unsafe-fixes`
+
+#### Import Ordering
+- **Error**: `I001 Import block is un-sorted or un-formatted`
+- **Fix**: Ruff will auto-fix with `--fix`
+
+#### Type Errors
+- **Error**: Mypy assignment errors
+- **Fix**: Add specific `# type: ignore[error-code]` comments
+- **Example**: `image = image.convert("RGB")  # type: ignore[assignment]`
+
+#### Missing Directories
+- **Error**: Database file path doesn't exist
+- **Fix**: Add `mkdir -p data` step in CI or tests
+
+## Database Conventions
+
+### SQLAlchemy Models
+```python
+from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column
+
+class ModelName(Base):
+    __tablename__ = "table_name"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    optional_field: Mapped[str | None] = mapped_column(Text, nullable=True)
+```
+
+### Pydantic Schemas
+```python
+from pydantic import BaseModel, Field, ConfigDict
+
+class ModelCreate(BaseModel):
+    """Schema for creating a model."""
+    name: str = Field(..., max_length=255)
+
+class ModelRead(BaseModel):
+    """Schema for reading a model."""
+    id: int
+    name: str
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+```
+
+### Alembic Migrations
+- **Location**: `backend/app/db/migrations/versions/`
+- **Generate**: `alembic revision --autogenerate -m "Description"`
+- **Apply**: `alembic upgrade head`
+- **Test**: Migrations must have upgrade/downgrade tests
+
+## Security & Secrets
+
+### Environment Variables
+- Store in `.env` (gitignored)
+- Load via Pydantic Settings
+- Example: `backend/app/config.py`
+
+### Required Environment Variables
+```bash
+SECRET_AES_KEY=<base64url-encoded 32-byte key>  # For token encryption
+OPENAI_API_KEY=<api-key>                         # For AI generation
+X_CLIENT_ID=<twitter-client-id>                  # For X/Twitter OAuth
+X_CLIENT_SECRET=<twitter-client-secret>
+LENGTH_SERVICE_URL=http://localhost:8080         # Node service
+DATABASE_URL=sqlite:///./data/threadify.db
+```
+
+### Encryption
+- Use AES-GCM for encrypting secrets at rest
+- Store keys as base64url-encoded strings
+- Version encrypted data: `v1:<encrypted-payload>`
+
+## Dependency Injection
+
+### Pattern for Testability
+```python
+def function_name(
+    param: str,
+    http_get: Callable[[str], httpx.Response] | None = None,
+) -> Result:
+    """Function with injectable HTTP client.
+    
+    Args:
+        param: Required parameter
+        http_get: Optional HTTP client (for testing/injection)
+    
+    Returns:
+        Result object
+    """
+    if http_get is None:
+        http_get = _default_http_get
+    
+    # Use http_get instead of direct httpx calls
+    response = http_get(url)
+    # ...
+
+def _default_http_get(url: str) -> httpx.Response:
+    """Default HTTP GET using httpx."""
+    with httpx.Client(timeout=30.0, follow_redirects=True) as client:
+        return client.get(url)
+```
+
+## Error Handling
+
+### Custom Exceptions
+```python
+class ModuleError(Exception):
+    """Base exception for module."""
+    pass
+
+class SpecificError(ModuleError):
+    """Raised when specific condition occurs."""
+    pass
+
+# Usage
+raise SpecificError(f"Descriptive message: {detail}")
+```
+
+### Error Handling Pattern
+```python
+try:
+    result = operation()
+except SpecificError:
+    raise  # Re-raise specific errors
+except Exception as e:
+    raise ModuleError(f"Operation failed: {e}") from e
+```
+
+## Commit Message Convention
+
+### Format
+```
+<type>: <short description>
+
+<detailed description if needed>
+
+Changes:
+- Item 1
+- Item 2
+
+<acceptance criteria if from prompt>
+```
+
+### Types
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation only
+- `style`: Code style/formatting
+- `refactor`: Code restructuring
+- `test`: Adding/updating tests
+- `chore`: Maintenance tasks
+
+## Prompt Implementation Workflow
+
+1. **Read prompt** from `prompt_plan.md`
+2. **Create TODO list** with `todo_write` tool
+3. **Write tests first** (TDD approach)
+4. **Implement feature** to make tests pass
+5. **Run all checks locally**:
+   ```bash
+   poetry run ruff check backend/ --fix
+   poetry run black backend/
+   poetry run mypy backend/app
+   poetry run pytest -v
+   ```
+6. **Commit changes** with descriptive message
+7. **Update `prompt_plan.md`** to mark prompt as completed
+8. **Verify GitHub Actions** passes before marking complete
+9. **Update TODO list** to mark all items complete
+
+## Common Patterns
+
+### Service Module Template
+```python
+"""Module description."""
+
+from collections.abc import Callable
+from dataclasses import dataclass
+
+import httpx
+
+
+class ModuleError(Exception):
+    """Raised when module operation fails."""
+    pass
+
+
+@dataclass
+class Result:
+    """Result of module operation."""
+    field1: str
+    field2: int
+
+
+def main_function(
+    param: str,
+    http_get: Callable[[str], httpx.Response] | None = None,
+) -> Result:
+    """
+    Function description.
+    
+    Args:
+        param: Parameter description
+        http_get: Optional HTTP client (for testing/injection)
+    
+    Returns:
+        Result object
+    
+    Raises:
+        ModuleError: If operation fails
+    """
+    if http_get is None:
+        http_get = _default_http_get
+    
+    # Implementation
+    return Result(field1="value", field2=42)
+
+
+def _default_http_get(url: str) -> httpx.Response:
+    """Default HTTP GET function using httpx."""
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+    with httpx.Client(timeout=30.0, follow_redirects=True, headers=headers) as client:
+        return client.get(url)
+```
+
+### Test File Template
+```python
+"""Tests for module."""
+
+import pytest
+
+from app.module import ModuleError, main_function
+
+
+def mock_http_get(response_data: str) -> object:
+    """Create mock HTTP GET function."""
+    def _get(url: str):
+        # Return mock response
+        pass
+    return _get
+
+
+def test_function_with_valid_input() -> None:
+    """Test that function handles valid input correctly."""
+    # Arrange
+    http_get = mock_http_get("test data")
+    
+    # Act
+    result = main_function("param", http_get=http_get)
+    
+    # Assert
+    assert result.field1 == "expected"
+
+
+def test_function_raises_error_on_invalid_input() -> None:
+    """Test that function raises error for invalid input."""
+    with pytest.raises(ModuleError, match="specific error message"):
+        main_function("invalid")
+```
+
+## Notes
+
+- All file paths use absolute paths when possible
+- Database migrations must be reversible (upgrade/downgrade)
+- Never commit `.env` files or secrets
+- Keep dependencies minimal and well-justified
+- Document complex algorithms with comments
+- Use meaningful variable names (no single letters except loop indices)
+- Prefer composition over inheritance
+- Keep functions small and focused (single responsibility)
+
+## Resources
+
+- Python style guide: PEP 8 + Black formatting
+- Type hints: PEP 484, 585, 604
+- FastAPI docs: https://fastapi.tiangolo.com/
+- SQLAlchemy docs: https://docs.sqlalchemy.org/
+- Pydantic docs: https://docs.pydantic.dev/
