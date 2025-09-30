@@ -42,6 +42,14 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
+      - name: Create data directory
+        run: mkdir -p data
+
+      - name: Set dummy environment variables
+        run: |
+          echo "SECRET_AES_KEY=$(python3 -c 'import os, base64; print(base64.urlsafe_b64encode(os.urandom(32)).decode())')" >> $GITHUB_ENV
+          echo "LENGTH_SERVICE_URL=http://localhost:8080" >> $GITHUB_ENV
+
       - name: Run ruff linter
         run: poetry run ruff check backend/
 
@@ -52,7 +60,7 @@ jobs:
         run: poetry run mypy backend/app
 
       - name: Run pytest
-        run: poetry run pytest -v
+        run: poetry run pytest --cov=backend/app --cov-report=xml --cov-report=term-missing -v
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
