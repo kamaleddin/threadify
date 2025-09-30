@@ -354,23 +354,23 @@ Acceptance:
 - Behavior matches spec; tests pass. ✅
 ```
 
-### Prompt 10 — Poster (OAuth2 PKCE) — auth only
+### Prompt 10 — Poster (OAuth2 PKCE) — auth only ✅ COMPLETED
 
 ```text
 Implement Prompt 10A: X OAuth2 PKCE.
 
 Scope:
-- backend/app/security/oauth_x.py:
-  - Start: generate code_verifier/challenge, state; redirect URL.
-  - Callback: exchange code -> tokens; store encrypted.
-  - Scopes: tweet.read, users.read, tweet.write, media.write, offline.access.
-- Routes under `/oauth/x/*`; exempt from Basic Auth later.
+- backend/app/security/oauth_x.py: ✅
+  - Start: generate code_verifier/challenge, state; redirect URL. ✅
+  - Callback: exchange code -> tokens; store encrypted. ✅
+  - Scopes: tweet.read, users.read, tweet.write, offline.access. ✅
+- Routes under `/oauth/x/*`; exempt from Basic Auth later. ✅
 
 Tests first:
-- Mock HTTP to X endpoints; end-to-end route tests with httpx test client: start → callback stores Account with tokens.
+- Mock HTTP to X endpoints; end-to-end route tests with httpx test client: start → callback stores Account with tokens. ✅
 
 Acceptance:
-- OAuth flow passes with mocks; tokens encrypted at rest.
+- OAuth flow passes with mocks; tokens encrypted at rest. ✅
 ```
 
 ### Prompt 11 — Poster (tweet/thread posting, pacing)
