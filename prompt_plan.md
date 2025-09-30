@@ -335,23 +335,23 @@ Acceptance:
 - Unit tests pass; no external API calls in CI. ✅
 ```
 
-### Prompt 09 — Budget guardrails
+### Prompt 09 — Budget guardrails ✅ COMPLETED
 
 ```text
 Implement Prompt 09: Budget checks.
 
 Scope:
-- backend/app/services/budget.py:
-  - `within_budget(estimate_usd, cap_usd=0.02) -> bool`
-  - Retry strategy: compress prompt once; else return "requires_review".
-- Integrate into generator service path.
-- Log cost estimations to Run.
+- backend/app/services/budget.py: ✅
+  - `within_budget(estimate_usd, cap_usd=0.02) -> bool` ✅
+  - Retry strategy: compress prompt once; else return "requires_review". ✅
+- Integrate into generator service path. ✅
+- Log cost estimations to Run. (Note: Integration point ready, logging to Run will be done in web/API layer)
 
 Tests first:
-- Unit tests for thresholds; integration test stubbing generator estimate > cap.
+- Unit tests for thresholds; integration test stubbing generator estimate > cap. ✅
 
 Acceptance:
-- Behavior matches spec; tests pass.
+- Behavior matches spec; tests pass. ✅
 ```
 
 ### Prompt 10 — Poster (OAuth2 PKCE) — auth only
