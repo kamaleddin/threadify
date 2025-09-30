@@ -373,24 +373,24 @@ Acceptance:
 - OAuth flow passes with mocks; tokens encrypted at rest. ✅
 ```
 
-### Prompt 11 — Poster (tweet/thread posting, pacing)
+### Prompt 11 — Poster (tweet/thread posting, pacing) ✅ COMPLETED
 
 ```text
 Implement Prompt 11B: Posting core.
 
 Scope:
-1) backend/app/services/post_x.py:
-   - `post_single(text, media=None)` and `post_thread(texts[], media_first=None, delay_jitter=3±0.5s)`.
-   - Resume from last success (store posted_tweet_id).
-   - Reference reply not counted in T.
-2) Rate-limit & retry (up to 3); respect headers.
+1) backend/app/services/post_x.py: ✅
+   - `post_single(text, media=None)` and `post_thread(texts[], media_first=None, delay_jitter=3±0.5s)`. ✅
+   - Resume from last success (store posted_tweet_id). ✅
+   - Reference reply not counted in T. ✅
+2) Rate-limit & retry (up to 3); respect headers. ✅
 
 Tests first:
-- Mock X API (post tweet, media upload).
-- Simulate mid-thread failure → resume once; second failure → return "requires_review".
+- Mock X API (post tweet, media upload). ✅
+- Simulate mid-thread failure → resume once; second failure → return "requires_review". ✅
 
 Acceptance:
-- Posting integration tests pass with mocks; pacing logic unit-tested (without sleeping; inject sleeper).
+- Posting integration tests pass with mocks; pacing logic unit-tested (without sleeping; inject sleeper). ✅
 ```
 
 ### Prompt 12 — Duplicate detection & canonical integration
