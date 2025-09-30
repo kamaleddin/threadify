@@ -23,6 +23,7 @@ readability-lxml = "^0.8.1"
 pillow = "^11.0.0"
 openai = "^1.57.0"
 apscheduler = "^3.10.4"
+itsdangerous = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
