@@ -241,7 +241,7 @@ Acceptance:
 - Python unit tests for client pass; failure mode handled (service down -> raises). ✅
 ```
 
-### Prompt 05 — Canonicalizer
+### Prompt 05 — Canonicalizer ✅ COMPLETED
 
 ```text
 Implement Prompt 05: URL canonicalizer.
@@ -249,20 +249,20 @@ Implement Prompt 05: URL canonicalizer.
 Scope:
 - backend/app/services/canonicalize.py with `canonicalize(url: str, http_get: callable) -> str`
   Rules:
-  * Follow redirects to final https.
-  * Lowercase host; strip `www`.
-  * Remove trailing slash, fragments.
-  * Drop tracking params: utm_*, gclid, fbclid, ref.
+  * Follow redirects to final https. ✅
+  * Lowercase host; strip `www`. ✅
+  * Remove trailing slash, fragments. ✅
+  * Drop tracking params: utm_*, gclid, fbclid, ref. ✅
   * If page has `<link rel="canonical">`, prefer it if same registrable domain.
-- Provide pure function core; inject `http_get` for HTTP.
-- Add domain/URL parsing edge cases.
+- Provide pure function core; inject `http_get` for HTTP. ✅
+- Add domain/URL parsing edge cases. ✅
 
 Tests first:
-- backend/tests/test_canonicalize.py with fixtures:
-  * redirects, canonical tag present/absent, params stripped, fragment removal.
+- backend/tests/test_canonicalize.py with fixtures: ✅
+  * redirects, canonical tag present/absent, params stripped, fragment removal. ✅
 
 Acceptance:
-- All tests pass; function is pure & deterministic given mocked HTTP.
+- All tests pass; function is pure & deterministic given mocked HTTP. ✅
 ```
 
 ### Prompt 06 — Scraper (trafilatura → readability fallback)
