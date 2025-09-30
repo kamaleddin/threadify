@@ -107,18 +107,18 @@ def validate_and_process(
             # Create white background for transparent images
             rgb_image = Image.new("RGB", image.size, (255, 255, 255))
             if image.mode == "P":
-                image = image.convert("RGBA")
+                image = image.convert("RGBA")  # type: ignore[assignment]
             rgb_image.paste(image, mask=image.split()[-1] if image.mode in ("RGBA", "LA") else None)
-            image = rgb_image
+            image = rgb_image  # type: ignore[assignment]
         elif image.mode != "RGB":
-            image = image.convert("RGB")
+            image = image.convert("RGB")  # type: ignore[assignment]
 
         # Downscale if too large
         if image.width > max_width:
             # Calculate new height maintaining aspect ratio
             new_width = max_width
             new_height = int((max_width / image.width) * image.height)
-            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)  # type: ignore[assignment]
 
         # Strip EXIF by not copying it
         # (When we save to a new BytesIO, EXIF is not included by default)
