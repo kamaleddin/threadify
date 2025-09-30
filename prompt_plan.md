@@ -309,30 +309,30 @@ Acceptance:
 - Unit tests pass; deterministic outputs (size, exif stripped). ✅
 ```
 
-### Prompt 08 — JSON generation schema & OpenAI wrapper
+### Prompt 08 — JSON generation schema & OpenAI wrapper ✅ COMPLETED
 
 ```text
 Implement Prompt 08: Generator wrapper.
 
 Scope:
-1) Define strict JSON schema for outputs for:
-   - Thread: `{tweets: [{text}], style_used, hook_used}`
-   - Single: `{text, style_used}`
-   - Reference: `{text}`
-2) backend/app/services/generate.py:
-   - `generate_thread(scrape_result, settings) -> GeneratedThread`
-   - `generate_single(scrape_result, settings) -> GeneratedPost`
-   - Implement prompt templates per spec (Extractive default, styles, hook toggle).
-   - Cost estimator: approximate tokens pre/post; return estimate.
-   - Fallback to GPT-4o on length >2.5k words.
-   - Robust JSON parse with retry if invalid.
+1) Define strict JSON schema for outputs for: ✅
+   - Thread: `{tweets: [{text}], style_used, hook_used}` ✅
+   - Single: `{text, style_used}` ✅
+   - Reference: `{text}` ✅
+2) backend/app/services/generate.py: ✅
+   - `generate_thread(scrape_result, settings) -> GeneratedThread` ✅
+   - `generate_single(scrape_result, settings) -> GeneratedPost` ✅
+   - Implement prompt templates per spec (Extractive default, styles, hook toggle). ✅
+   - Cost estimator: approximate tokens pre/post; return estimate. ✅
+   - Fallback to GPT-4o on length >2.5k words. ✅
+   - Robust JSON parse with retry if invalid. ✅
 
 Tests first:
-- Mock OpenAI client to return fixture JSON and malformed JSON (retry path).
-- Assert style flags and extractive mode behaviors.
+- Mock OpenAI client to return fixture JSON and malformed JSON (retry path). ✅
+- Assert style flags and extractive mode behaviors. ✅
 
 Acceptance:
-- Unit tests pass; no external API calls in CI.
+- Unit tests pass; no external API calls in CI. ✅
 ```
 
 ### Prompt 09 — Budget guardrails
