@@ -168,3 +168,27 @@ def get_tweets_by_run(db: Session, run_id: int) -> list[Tweet]:
         List of tweet instances ordered by idx
     """
     return db.query(Tweet).filter(Tweet.run_id == run_id).order_by(Tweet.idx).all()
+
+
+def find_duplicate_run(db: Session, account_id: int, canonical_url: str) -> Run | None:
+    """
+    Find a completed or approved run for the same account and canonical URL.
+
+    Args:
+        db: Database session
+        account_id: Account ID
+        canonical_url: Canonical URL to check
+
+    Returns:
+        Most recent matching run or None
+    """
+    return (
+        db.query(Run)
+        .filter(
+            Run.account_id == account_id,
+            Run.canonical_url == canonical_url,
+            Run.status.in_(["completed", "approved"]),
+        )
+        .order_by(Run.submitted_at.desc())
+        .first()
+    )
