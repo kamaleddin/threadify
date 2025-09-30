@@ -393,20 +393,20 @@ Acceptance:
 - Posting integration tests pass with mocks; pacing logic unit-tested (without sleeping; inject sleeper). ✅
 ```
 
-### Prompt 12 — Duplicate detection & canonical integration
+### Prompt 12 — Duplicate detection & canonical integration ✅ COMPLETED
 
 ```text
 Implement Prompt 12: Duplicate rules.
 
 Scope:
-- On submission, canonicalize URL; if a completed/approved Run exists for same account+canonical, block unless `force`.
-- In Review, warn but allow.
+- On submission, canonicalize URL; if a completed/approved Run exists for same account+canonical, block unless `force`. ✅
+- In Review, warn but allow. ✅
 
 Tests first:
-- Unit test scenarios: auto-post duplicate blocked; review allowed; force overrides.
+- Unit test scenarios: auto-post duplicate blocked; review allowed; force overrides. ✅
 
 Acceptance:
-- Tests pass; wiring into submission endpoint is complete.
+- Tests pass; wiring into submission endpoint is complete. ✅
 ```
 
 ### Prompt 13 — Web: form + Review UI (HTMX/Jinja)
