@@ -401,7 +401,7 @@ def generate_thread(
     parsed_base, tokens_in, tokens_out = _call_openai(
         prompt, model, GeneratedThreadSchema, openai_client
     )
-    
+
     # Cast to the correct type
     parsed = GeneratedThreadSchema.model_validate(parsed_base)
 
@@ -449,7 +449,7 @@ def generate_single(
     parsed_base, tokens_in, tokens_out = _call_openai(
         prompt, model, GeneratedSingleSchema, openai_client
     )
-    
+
     # Cast to the correct type
     parsed = GeneratedSingleSchema.model_validate(parsed_base)
 
@@ -493,7 +493,7 @@ def generate_reference(
     parsed_base, tokens_in, tokens_out = _call_openai(
         prompt, model, GeneratedReferenceSchema, openai_client
     )
-    
+
     # Cast to the correct type
     parsed = GeneratedReferenceSchema.model_validate(parsed_base)
 
