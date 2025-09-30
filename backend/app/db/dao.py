@@ -1,6 +1,5 @@
 """Data Access Objects (DAO) for database operations."""
 
-
 from sqlalchemy.orm import Session
 
 from app.db.models import Account, Run, Tweet
@@ -11,11 +10,11 @@ from app.db.schema import AccountCreate, RunCreate, TweetCreate
 def create_account(db: Session, account: AccountCreate) -> Account:
     """
     Create a new account.
-    
+
     Args:
         db: Database session
         account: Account data
-        
+
     Returns:
         Created account instance
     """
@@ -33,11 +32,11 @@ def create_account(db: Session, account: AccountCreate) -> Account:
 def get_account(db: Session, account_id: int) -> Account | None:
     """
     Get account by ID.
-    
+
     Args:
         db: Database session
         account_id: Account ID
-        
+
     Returns:
         Account instance or None
     """
@@ -47,11 +46,11 @@ def get_account(db: Session, account_id: int) -> Account | None:
 def get_account_by_handle(db: Session, handle: str) -> Account | None:
     """
     Get account by handle.
-    
+
     Args:
         db: Database session
         handle: Account handle
-        
+
     Returns:
         Account instance or None
     """
@@ -62,11 +61,11 @@ def get_account_by_handle(db: Session, handle: str) -> Account | None:
 def create_run(db: Session, run: RunCreate) -> Run:
     """
     Create a new run.
-    
+
     Args:
         db: Database session
         run: Run data
-        
+
     Returns:
         Created run instance
     """
@@ -86,11 +85,11 @@ def create_run(db: Session, run: RunCreate) -> Run:
 def get_run(db: Session, run_id: int) -> Run | None:
     """
     Get run by ID.
-    
+
     Args:
         db: Database session
         run_id: Run ID
-        
+
     Returns:
         Run instance or None
     """
@@ -100,12 +99,12 @@ def get_run(db: Session, run_id: int) -> Run | None:
 def get_runs_by_account(db: Session, account_id: int, limit: int = 100) -> list[Run]:
     """
     Get runs for an account.
-    
+
     Args:
         db: Database session
         account_id: Account ID
         limit: Maximum number of runs to return
-        
+
     Returns:
         List of run instances
     """
@@ -122,11 +121,11 @@ def get_runs_by_account(db: Session, account_id: int, limit: int = 100) -> list[
 def create_tweet(db: Session, tweet: TweetCreate) -> Tweet:
     """
     Create a new tweet.
-    
+
     Args:
         db: Database session
         tweet: Tweet data
-        
+
     Returns:
         Created tweet instance
     """
@@ -146,11 +145,11 @@ def create_tweet(db: Session, tweet: TweetCreate) -> Tweet:
 def get_tweet(db: Session, tweet_id: int) -> Tweet | None:
     """
     Get tweet by ID.
-    
+
     Args:
         db: Database session
         tweet_id: Tweet ID
-        
+
     Returns:
         Tweet instance or None
     """
@@ -160,11 +159,11 @@ def get_tweet(db: Session, tweet_id: int) -> Tweet | None:
 def get_tweets_by_run(db: Session, run_id: int) -> list[Tweet]:
     """
     Get all tweets for a run, ordered by index.
-    
+
     Args:
         db: Database session
         run_id: Run ID
-        
+
     Returns:
         List of tweet instances ordered by idx
     """

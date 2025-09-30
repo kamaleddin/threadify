@@ -76,13 +76,13 @@ class LengthClient:
             httpx.HTTPError: If the request fails
         """
         try:
-            response = self._client.post(
-                f"{self.base_url}/length/check", json={"text": text}
-            )
+            response = self._client.post(f"{self.base_url}/length/check", json={"text": text})
 
             if response.status_code == 400:
                 error_data = response.json()
-                raise LengthServiceError(f"Invalid request: {error_data.get('error', 'Unknown error')}")
+                raise LengthServiceError(
+                    f"Invalid request: {error_data.get('error', 'Unknown error')}"
+                )
 
             response.raise_for_status()
 
@@ -116,13 +116,13 @@ class LengthClient:
             httpx.HTTPError: If the request fails
         """
         try:
-            response = self._client.post(
-                f"{self.base_url}/length/batch", json={"texts": texts}
-            )
+            response = self._client.post(f"{self.base_url}/length/batch", json={"texts": texts})
 
             if response.status_code == 400:
                 error_data = response.json()
-                raise LengthServiceError(f"Invalid request: {error_data.get('error', 'Unknown error')}")
+                raise LengthServiceError(
+                    f"Invalid request: {error_data.get('error', 'Unknown error')}"
+                )
 
             response.raise_for_status()
 

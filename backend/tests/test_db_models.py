@@ -59,9 +59,7 @@ def test_create_and_get_account(db_session: Session) -> None:
 def test_create_and_get_run(db_session: Session) -> None:
     """Test creating and retrieving a run."""
     # First create an account
-    account = create_account(
-        db_session, AccountCreate(handle="@runner", provider="x")
-    )
+    account = create_account(db_session, AccountCreate(handle="@runner", provider="x"))
 
     # Create run
     run_data = RunCreate(
@@ -96,23 +94,19 @@ def test_create_and_get_run(db_session: Session) -> None:
 def test_create_and_get_tweet(db_session: Session) -> None:
     """Test creating and retrieving tweets."""
     # Create account and run first
-    account = create_account(
-        db_session, AccountCreate(handle="@tweeter", provider="x")
-    )
+    account = create_account(db_session, AccountCreate(handle="@tweeter", provider="x"))
     run = create_run(
         db_session,
-        RunCreate(account_id=account.id, url="https://example.com/test", mode="auto", type="thread"),
+        RunCreate(
+            account_id=account.id, url="https://example.com/test", mode="auto", type="thread"
+        ),
     )
 
     # Create tweets
-    tweet1_data = TweetCreate(
-        run_id=run.id, idx=0, role="content", text="First tweet in thread"
-    )
+    tweet1_data = TweetCreate(run_id=run.id, idx=0, role="content", text="First tweet in thread")
     tweet1 = create_tweet(db_session, tweet1_data)
 
-    tweet2_data = TweetCreate(
-        run_id=run.id, idx=1, role="content", text="Second tweet in thread"
-    )
+    tweet2_data = TweetCreate(run_id=run.id, idx=1, role="content", text="Second tweet in thread")
     create_tweet(db_session, tweet2_data)
 
     assert tweet1.id is not None
@@ -138,9 +132,7 @@ def test_create_and_get_tweet(db_session: Session) -> None:
 
 def test_account_runs_relationship(db_session: Session) -> None:
     """Test the relationship between accounts and runs."""
-    account = create_account(
-        db_session, AccountCreate(handle="@reltest", provider="x")
-    )
+    account = create_account(db_session, AccountCreate(handle="@reltest", provider="x"))
 
     # Create multiple runs
     run1 = create_run(
@@ -161,12 +153,12 @@ def test_account_runs_relationship(db_session: Session) -> None:
 
 def test_run_tweets_relationship(db_session: Session) -> None:
     """Test the relationship between runs and tweets."""
-    account = create_account(
-        db_session, AccountCreate(handle="@tweetrel", provider="x")
-    )
+    account = create_account(db_session, AccountCreate(handle="@tweetrel", provider="x"))
     run = create_run(
         db_session,
-        RunCreate(account_id=account.id, url="https://example.com/test", mode="review", type="thread"),
+        RunCreate(
+            account_id=account.id, url="https://example.com/test", mode="review", type="thread"
+        ),
     )
 
     # Create tweets

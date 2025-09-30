@@ -135,9 +135,7 @@ def canonicalize(
         params = parse_qs(parsed.query, keep_blank_values=True)
 
         # Remove tracking parameters
-        filtered_params = {
-            k: v for k, v in params.items() if k.lower() not in TRACKING_PARAMS
-        }
+        filtered_params = {k: v for k, v in params.items() if k.lower() not in TRACKING_PARAMS}
 
         # Sort parameters for consistency
         if filtered_params:
@@ -220,7 +218,9 @@ def _follow_redirects(
                 else:
                     # Relative path
                     base_path = parsed_current.path.rsplit("/", 1)[0]
-                    location = f"{parsed_current.scheme}://{parsed_current.netloc}{base_path}/{location}"
+                    location = (
+                        f"{parsed_current.scheme}://{parsed_current.netloc}{base_path}/{location}"
+                    )
 
             current_url = location
         else:

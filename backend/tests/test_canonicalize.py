@@ -1,9 +1,8 @@
 """Tests for URL canonicalization."""
 
 import pytest
-from httpx import Response
-
 from app.services.canonicalize import CanonicalizationError, canonicalize
+from httpx import Response
 
 
 def test_canonicalize_adds_https_scheme() -> None:
@@ -143,9 +142,7 @@ def test_canonicalize_with_redirect() -> None:
 
     def mock_http_get(url: str) -> Response:
         if url == "https://example.com/old":
-            return Response(
-                status_code=301, headers={"location": "https://example.com/new"}
-            )
+            return Response(status_code=301, headers={"location": "https://example.com/new"})
         return Response(status_code=200)
 
     url = "https://example.com/old"
@@ -158,13 +155,9 @@ def test_canonicalize_with_multiple_redirects() -> None:
 
     def mock_http_get(url: str) -> Response:
         if url == "https://example.com/1":
-            return Response(
-                status_code=302, headers={"location": "https://example.com/2"}
-            )
+            return Response(status_code=302, headers={"location": "https://example.com/2"})
         elif url == "https://example.com/2":
-            return Response(
-                status_code=302, headers={"location": "https://example.com/final"}
-            )
+            return Response(status_code=302, headers={"location": "https://example.com/final"})
         return Response(status_code=200)
 
     url = "https://example.com/1"
@@ -190,13 +183,9 @@ def test_canonicalize_redirect_loop_detected() -> None:
 
     def mock_http_get(url: str) -> Response:
         if url == "https://example.com/a":
-            return Response(
-                status_code=301, headers={"location": "https://example.com/b"}
-            )
+            return Response(status_code=301, headers={"location": "https://example.com/b"})
         elif url == "https://example.com/b":
-            return Response(
-                status_code=301, headers={"location": "https://example.com/a"}
-            )
+            return Response(status_code=301, headers={"location": "https://example.com/a"})
         return Response(status_code=200)
 
     url = "https://example.com/a"
@@ -265,9 +254,7 @@ def test_canonicalize_no_redirects_when_disabled() -> None:
     """Test that redirects are not followed when disabled."""
 
     def mock_http_get(url: str) -> Response:
-        return Response(
-            status_code=301, headers={"location": "https://example.com/new"}
-        )
+        return Response(status_code=301, headers={"location": "https://example.com/new"})
 
     url = "https://example.com/old"
     result = canonicalize(url, http_get=mock_http_get, follow_redirects=False)

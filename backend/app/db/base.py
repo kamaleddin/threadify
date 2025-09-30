@@ -29,7 +29,7 @@ class Base(DeclarativeBase):
 def get_db() -> Generator[Session, None, None]:
     """
     Dependency function to get database session.
-    
+
     Yields:
         Session: SQLAlchemy database session
     """

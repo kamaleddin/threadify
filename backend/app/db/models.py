@@ -94,9 +94,7 @@ class Run(Base):
     account_id: Mapped[int] = mapped_column(Integer, ForeignKey("accounts.id"), nullable=False)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     canonical_url: Mapped[str | None] = mapped_column(String(2048), nullable=True, index=True)
-    mode: Mapped[str] = mapped_column(
-        String(50), default="review", nullable=False
-    )  # review, auto
+    mode: Mapped[str] = mapped_column(String(50), default="review", nullable=False)  # review, auto
     type: Mapped[str] = mapped_column(
         String(50), default="thread", nullable=False
     )  # thread, single
@@ -135,9 +133,7 @@ class Tweet(Base):
     )  # content, reference
     text: Mapped[str] = mapped_column(Text, nullable=False)
     media_alt: Mapped[str | None] = mapped_column(String(1000), nullable=True)
-    posted_tweet_id: Mapped[str | None] = mapped_column(
-        String(255), nullable=True, index=True
-    )
+    posted_tweet_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
     permalink: Mapped[str | None] = mapped_column(String(500), nullable=True)
     posted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 

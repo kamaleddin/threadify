@@ -1,9 +1,7 @@
 """Tests for the length service HTTP client."""
 
 import pytest
-from httpx import Response
-
-from app.clients.length_client import LengthClient, LengthServiceError
+from app.clients.length_client import LengthClient
 
 
 @pytest.fixture
