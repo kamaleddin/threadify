@@ -287,26 +287,26 @@ Acceptance:
 - Deterministic scraping on fixtures; no network needed in tests. ✅
 ```
 
-### Prompt 07 — Hero image selection & processing
+### Prompt 07 — Hero image selection & processing ✅ COMPLETED
 
 ```text
 Implement Prompt 07: Hero image pipeline.
 
 Scope:
 1) backend/app/services/images.py:
-   - `pick_hero(candidates) -> Optional[Hero]` (choose og:image → twitter:image → largest in-article).
-   - `validate_and_process(url) -> (bytes,jpeg_width,height)`:
-       * Ensure width >= 800px (reject smaller).
-       * Downscale to <=1600px width, strip EXIF, re-encode JPEG.
-   - `alt_text_from(title, lede) <= 120 chars`.
+   - `pick_hero(candidates) -> Optional[Hero]` (choose og:image → twitter:image → largest in-article). ✅
+   - `validate_and_process(url) -> (bytes,jpeg_width,height)`: ✅
+       * Ensure width >= 800px (reject smaller). ✅
+       * Downscale to <=1600px width, strip EXIF, re-encode JPEG. ✅
+   - `alt_text_from(title, lede) <= 120 chars`. ✅
 2) Save transiently; no persistent cache in MVP.
 
 Tests first:
-- Use PIL-generated images in tests.
-- Cases: too small rejected; large downscaled; EXIF stripped; alt text length.
+- Use PIL-generated images in tests. ✅
+- Cases: too small rejected; large downscaled; EXIF stripped; alt text length. ✅
 
 Acceptance:
-- Unit tests pass; deterministic outputs (size, exif stripped).
+- Unit tests pass; deterministic outputs (size, exif stripped). ✅
 ```
 
 ### Prompt 08 — JSON generation schema & OpenAI wrapper
