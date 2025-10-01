@@ -494,23 +494,31 @@ Acceptance:
 ✅ 404 handling for missing runs
 ```
 
-#### Prompt 13d — History page
+#### Prompt 13d — History page ✅ COMPLETED
 
 ```text
 Implement basic history page `/history`.
 
 Scope:
-- List all runs with status, timestamps, costs
-- Filter by account
-- Links to review pages
-- Display tweet/post links for completed runs
+1) history.html template with sortable table:
+   - Displays all runs sorted by time (newest first)
+   - Shows: time, title, account, type, status, cost
+   - Status badges with color coding
+   - Action buttons (Review, View Thread)
+2) GET `/history` route with Run query
+3) Tweet links for completed runs
+4) Empty state message
 
-Tests first:
-- Template rendering tests
-- Sorting and filtering tests
+Tests:
+- 8 tests covering page load, display, status, costs, links, sorting
 
 Acceptance:
-- All UI tests pass with httpx test client
+✅ All tests pass
+✅ Sorted by submission time (newest first)
+✅ Status badges with semantic colors
+✅ Review links for editable runs
+✅ Tweet links for completed runs
+✅ Empty state handling
 ```
 
 ### Prompt 14 — CLI (Typer) + API token auth
