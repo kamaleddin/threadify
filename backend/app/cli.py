@@ -1,9 +1,7 @@
 """Command-line interface for Threadify."""
 
 import json
-import sys
 from pathlib import Path
-from typing import Optional
 
 import httpx
 import typer
@@ -23,7 +21,7 @@ def get_config_path() -> Path:
     return Path.home() / ".threadify" / "config.json"
 
 
-def load_config() -> dict:
+def load_config() -> dict[str, str]:
     """Load configuration from file."""
     config_path = get_config_path()
     if not config_path.exists():
@@ -36,7 +34,7 @@ def load_config() -> dict:
             return json.load(f)
     except Exception as e:
         rprint(f"[red]Error loading config:[/red] {e}")
-        raise typer.Exit(1)
+        raise typer.Exit(1) from e
 
 
 def save_config(api_token: str, api_url: str) -> None:
@@ -71,20 +69,22 @@ def configure() -> None:
 def submit(
     url: str = typer.Argument(..., help="URL of the blog post to convert"),
     auto: bool = typer.Option(False, "--auto", help="Post automatically without review"),
-    account: Optional[str] = typer.Option(None, "--account", "-a", help="Twitter/X account handle"),
-    style: Optional[str] = typer.Option(
+    account: str | None = typer.Option(None, "--account", "-a", help="Twitter/X account handle"),
+    style: str | None = typer.Option(
         None,
         "--style",
         "-s",
-        help="Writing style: extractive, explanatory, provocative, academic, punchy"
+        help="Writing style: extractive, explanatory, provocative, academic, punchy",
     ),
     single: bool = typer.Option(False, "--single", help="Create single post instead of thread"),
     hook: bool = typer.Option(False, "--hook", help="Add engaging hook to first tweet"),
     image: bool = typer.Option(False, "--image", help="Include hero image if available"),
-    reference: Optional[str] = typer.Option(None, "--reference", "-r", help="Reference reply text"),
-    utm: Optional[str] = typer.Option(None, "--utm", "-u", help="UTM campaign parameter"),
-    thread_cap: Optional[int] = typer.Option(None, "--thread-cap", help="Maximum tweets in thread"),
-    single_cap: Optional[int] = typer.Option(None, "--single-cap", help="Maximum characters in single post"),
+    reference: str | None = typer.Option(None, "--reference", "-r", help="Reference reply text"),
+    utm: str | None = typer.Option(None, "--utm", "-u", help="UTM campaign parameter"),
+    thread_cap: int | None = typer.Option(None, "--thread-cap", help="Maximum tweets in thread"),
+    single_cap: int | None = typer.Option(
+        None, "--single-cap", help="Maximum characters in single post"
+    ),
     force: bool = typer.Option(False, "--force", "-f", help="Force submission even if duplicate"),
 ) -> None:
     """Submit a blog post URL for conversion to Twitter/X thread or post."""
@@ -104,9 +104,9 @@ def submit(
     if style:
         payload["style"] = style
     if hook:
-        payload["hook"] = True
+        payload["hook"] = hook
     if image:
-        payload["image"] = True
+        payload["image"] = image
     if reference:
         payload["reference"] = reference
     if utm:
@@ -116,7 +116,7 @@ def submit(
     if single_cap:
         payload["single_cap"] = single_cap
     if force:
-        payload["force"] = True
+        payload["force"] = force
 
     # Make API request
     api_url = config["api_url"]
@@ -136,7 +136,7 @@ def submit(
             rprint(f"[red]Error submitting URL:[/red] {e}")
             if hasattr(e, "response") and e.response:
                 rprint(f"[red]Response:[/red] {e.response.text}")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from e
 
     # Handle response based on mode
     if response.status_code == 303:  # Redirect to review
@@ -157,7 +157,7 @@ def submit(
             table.add_column("Tweet", style="cyan", no_wrap=False)
             table.add_column("Link", style="green")
 
-            for i, tweet in enumerate(result["tweets"], 1):
+            for _i, tweet in enumerate(result["tweets"], 1):
                 tweet_text = tweet.get("text", "")
                 if len(tweet_text) > 50:
                     tweet_text = tweet_text[:50] + "..."

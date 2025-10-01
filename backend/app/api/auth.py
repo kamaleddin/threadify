@@ -1,9 +1,7 @@
 """API authentication middleware."""
 
-from typing import Optional
-
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.db.base import get_db
@@ -21,7 +19,7 @@ def verify_api_token(
     token = credentials.credentials
 
     # Look up all API tokens and check against hashed versions
-    api_tokens = db.query(ApiToken).filter(ApiToken.is_active == True).all()
+    api_tokens = db.query(ApiToken).filter(ApiToken.is_active.is_(True)).all()  # type: ignore[attr-defined]
 
     for api_token in api_tokens:
         if verify_password(token, api_token.token_hash):

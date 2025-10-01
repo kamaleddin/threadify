@@ -1,14 +1,12 @@
 """Tests for CLI commands."""
 
 import json
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from typer.testing import CliRunner
-
 from app.cli import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
@@ -88,7 +86,7 @@ def test_cli_submit_auto_mode(
         "tweets": [
             {"text": "Tweet 1", "permalink": "https://twitter.com/user/status/123"},
             {"text": "Tweet 2", "permalink": "https://twitter.com/user/status/124"},
-        ]
+        ],
     }
     mock_response.raise_for_status = MagicMock()
     mock_post.return_value = mock_response
@@ -126,9 +124,7 @@ def test_cli_with_account(
 
 @patch("app.cli.Path.home")
 @patch("httpx.post")
-def test_cli_with_style(
-    mock_post: MagicMock, mock_home: MagicMock, mock_config_file: Path
-) -> None:
+def test_cli_with_style(mock_post: MagicMock, mock_home: MagicMock, mock_config_file: Path) -> None:
     """Test specifying style."""
     mock_home.return_value = mock_config_file.parent.parent
 
@@ -172,11 +168,7 @@ def test_cli_configure(mock_home: MagicMock, tmp_path: Path) -> None:
     mock_home.return_value = tmp_path
 
     # Simulate user input
-    result = runner.invoke(
-        app,
-        ["configure"],
-        input="my-api-token\nhttps://api.example.com\n"
-    )
+    result = runner.invoke(app, ["configure"], input="my-api-token\nhttps://api.example.com\n")
 
     assert result.exit_code == 0
     assert "Configuration saved" in result.output
@@ -204,9 +196,7 @@ def test_cli_no_config_file(mock_home: MagicMock, tmp_path: Path) -> None:
 
 @patch("app.cli.Path.home")
 @patch("httpx.post")
-def test_cli_api_error(
-    mock_post: MagicMock, mock_home: MagicMock, mock_config_file: Path
-) -> None:
+def test_cli_api_error(mock_post: MagicMock, mock_home: MagicMock, mock_config_file: Path) -> None:
     """Test handling API errors."""
     mock_home.return_value = mock_config_file.parent.parent
 
@@ -236,19 +226,26 @@ def test_cli_with_all_options(
     mock_response.raise_for_status = MagicMock()
     mock_post.return_value = mock_response
 
-    result = runner.invoke(app, [
-        "submit",
-        "https://example.com/article",
-        "--auto",
-        "--account", "myhandle",
-        "--style", "punchy",
-        "--single",
-        "--hook",
-        "--image",
-        "--reference", "Check this out",
-        "--utm", "summer_campaign",
-        "--force",
-    ])
+    result = runner.invoke(
+        app,
+        [
+            "submit",
+            "https://example.com/article",
+            "--auto",
+            "--account",
+            "myhandle",
+            "--style",
+            "punchy",
+            "--single",
+            "--hook",
+            "--image",
+            "--reference",
+            "Check this out",
+            "--utm",
+            "summer_campaign",
+            "--force",
+        ],
+    )
 
     assert result.exit_code == 0
     call_args = mock_post.call_args

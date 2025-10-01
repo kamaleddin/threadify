@@ -1,15 +1,13 @@
 """API routes for CLI access."""
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, HttpUrl
 from sqlalchemy.orm import Session
 
 from app.api.auth import get_current_api_token
 from app.db.base import get_db
-from app.db.dao import create_run, create_tweet, find_duplicate_run
-from app.db.models import Account, ApiToken, Run
+from app.db.dao import create_run, create_tweet
+from app.db.models import Account, ApiToken
 from app.db.schema import RunCreate, TweetCreate
 from app.services.budget import within_budget
 from app.services.canonicalize import canonicalize
@@ -27,14 +25,14 @@ class SubmitRequest(BaseModel):
     url: HttpUrl
     mode: str = "review"  # review or auto
     type: str = "thread"  # thread or single
-    account: Optional[str] = None  # Account handle
-    style: Optional[str] = None
+    account: str | None = None  # Account handle
+    style: str | None = None
     hook: bool = False
     image: bool = False
-    reference: Optional[str] = None
-    utm: Optional[str] = None
-    thread_cap: Optional[int] = None
-    single_cap: Optional[int] = None
+    reference: str | None = None
+    utm: str | None = None
+    thread_cap: int | None = None
+    single_cap: int | None = None
     force: bool = False
 
 
@@ -43,8 +41,8 @@ class SubmitResponse(BaseModel):
 
     status: str
     run_id: int
-    review_url: Optional[str] = None
-    tweets: Optional[list] = None
+    review_url: str | None = None
+    tweets: list | None = None
 
 
 @router.post("/submit", response_model=SubmitResponse)
@@ -86,7 +84,7 @@ async def api_submit(
         force=request.force,
     )
 
-    if duplicate_check.is_duplicate and duplicate_check.blocks_submission:
+    if duplicate_check.is_duplicate and duplicate_check.blocks_submission:  # type: ignore[attr-defined]
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Duplicate submission. Previous run ID: {duplicate_check.previous_run_id}",
@@ -102,7 +100,7 @@ async def api_submit(
         hero = pick_hero(scraped.hero_candidates)
         if hero:
             try:
-                hero_image_bytes, _, _ = validate_and_process(hero.url)
+                hero_image_bytes, _, _ = validate_and_process(hero.url)  # type: ignore[misc, attr-defined]
                 hero_alt_text = alt_text_from(scraped.title, scraped.title)
             except Exception:
                 pass  # Silently skip if image processing fails
@@ -117,7 +115,7 @@ async def api_submit(
             "hook": request.hook,
             "thread_cap": request.thread_cap,
             "single_cap": request.single_cap,
-        }
+        },
     )  # type: ignore[call-arg]
 
     # 6. Check budget
