@@ -109,7 +109,7 @@ async def api_submit(
     # Note: This is a simplified version - in production you'd pass proper settings
     generation_result = generate_thread(
         scraped_content=scraped,
-        settings={
+        settings={  # type: ignore[arg-type]
             "type": request.type,
             "style": request.style or "extractive",
             "hook": request.hook,

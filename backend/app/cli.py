@@ -31,7 +31,7 @@ def load_config() -> dict[str, str]:
 
     try:
         with open(config_path) as f:
-            return json.load(f)
+            return json.load(f)  # type: ignore[no-any-return]
     except Exception as e:
         rprint(f"[red]Error loading config:[/red] {e}")
         raise typer.Exit(1) from e
@@ -92,7 +92,7 @@ def submit(
     config = load_config()
 
     # Build request payload
-    payload = {
+    payload: dict[str, str | int | bool] = {
         "url": url,
         "mode": "auto" if auto else "review",
         "type": "single" if single else "thread",
