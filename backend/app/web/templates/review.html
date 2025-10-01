@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Review Thread - {{ run.scraped_title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Review Thread</h2>
+
+    <div class="run-meta">
+        <h3>{{ run.scraped_title }}</h3>
+        <p class="meta-info">
+            <strong>Source:</strong> <a href="{{ run.url }}" target="_blank">{{ run.url }}</a><br>
+            <strong>Account:</strong> @{{ account.handle }}<br>
+            <strong>Type:</strong> {{ run.type }}<br>
+            <strong>Cost:</strong> ${{ "%.4f"|format(run.cost_estimate or 0) }}<br>
+            <strong>Tokens:</strong> {{ run.tokens_in or 0 }} in, {{ run.tokens_out or 0 }} out<br>
+            <strong>Word Count:</strong> {{ run.word_count }}
+        </p>
+    </div>
+
+    <div class="tweets-container">
+        <h3>Thread ({{ tweets|length }} tweets)</h3>
+
+        {% for tweet in tweets %}
+        <div class="tweet-card" id="tweet-{{ tweet.id }}">
+            <div class="tweet-header">
+                <span class="tweet-number">{{ loop.index }}/{{ tweets|length }}</span>
+                <span class="tweet-role">{{ tweet.role }}</span>
+            </div>
+
+            <div class="tweet-content">
+                <textarea
+                    id="tweet-text-{{ tweet.id }}"
+                    class="tweet-textarea"
+                    hx-post="/review/{{ run.id }}/tweet/{{ tweet.id }}"
+                    hx-trigger="blur"
+                    hx-target="#tweet-{{ tweet.id }}"
+                    hx-swap="outerHTML"
+                    name="text"
+                >{{ tweet.text }}</textarea>
+                <div class="tweet-char-count" id="char-count-{{ tweet.id }}">
+                    {{ tweet.text|length }}/280
+                </div>
+            </div>
+
+            {% if tweet.media_alt %}
+            <div class="tweet-media">
+                <p><strong>Image alt text:</strong></p>
+                <textarea
+                    class="alt-textarea"
+                    hx-post="/review/{{ run.id }}/tweet/{{ tweet.id }}/alt"
+                    hx-trigger="blur"
+                    name="media_alt"
+                >{{ tweet.media_alt }}</textarea>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="review-actions">
+        <button
+            class="btn-secondary"
+            hx-post="/review/{{ run.id }}/regenerate"
+            hx-confirm="Regenerate entire thread? This will replace all tweets."
+            hx-target="body"
+        >
+            Regenerate Thread
+        </button>
+
+        <form action="/review/{{ run.id }}/approve" method="POST" style="display: inline;">
+            <button type="submit" class="btn-primary">
+                Approve & Post
+            </button>
+        </form>
+
+        <a href="/history" class="btn-secondary">Back to History</a>
+    </div>
+</div>
+
+<script>
+// Update character counts on input
+document.querySelectorAll('.tweet-textarea').forEach(textarea => {
+    const tweetId = textarea.id.replace('tweet-text-', '');
+    const counter = document.getElementById('char-count-' + tweetId);
+
+    textarea.addEventListener('input', () => {
+        const length = textarea.value.length;
+        counter.textContent = length + '/280';
+
+        // Highlight if over limit
+        if (length > 280) {
+            counter.style.color = 'red';
+            counter.style.fontWeight = 'bold';
+        } else {
+            counter.style.color = '';
+            counter.style.fontWeight = '';
+        }
+    });
+});
+</script>
+
+<style>
+.run-meta {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.run-meta h3 {
+    margin-bottom: 1rem;
+    color: #1da1f2;
+}
+
+.meta-info {
+    font-size: 0.875rem;
+    line-height: 1.8;
+}
+
+.tweets-container {
+    margin-bottom: 2rem;
+}
+
+.tweet-card {
+    background-color: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.tweet-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #657786;
+}
+
+.tweet-number {
+    font-weight: bold;
+}
+
+.tweet-role {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.tweet-content {
+    position: relative;
+}
+
+.tweet-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem;
+    border: 1px solid #e1e8ed;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+.tweet-textarea:focus {
+    outline: none;
+    border-color: #1da1f2;
+    box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.1);
+}
+
+.tweet-char-count {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #657786;
+    margin-top: 0.25rem;
+}
+
+.tweet-media {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e1e8ed;
+}
+
+.alt-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.5rem;
+    border: 1px solid #e1e8ed;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+.review-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 2rem 0;
+    border-top: 2px solid #e1e8ed;
+}
+</style>
+{% endblock %}

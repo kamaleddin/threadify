@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.db.base import get_db
 from app.db.dao import create_run, create_tweet
-from app.db.models import Account
+from app.db.models import Account, Run, Tweet
 from app.db.schema import RunCreate, TweetCreate
 from app.services.budget import within_budget
 from app.services.canonicalize import CanonicalizationError, canonicalize
@@ -234,3 +234,197 @@ async def submit(
         raise HTTPException(status_code=500, detail=f"Failed to generate content: {e}") from e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}") from e
+
+
+@router.get("/review/{run_id}", response_class=HTMLResponse)
+async def review(run_id: int, request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    """
+    Display review page for a run with editable tweets.
+
+    Args:
+        run_id: Run ID to review
+        request: FastAPI request
+        db: Database session
+
+    Returns:
+        HTML review page
+
+    Raises:
+        HTTPException: If run not found
+    """
+    # Get run with tweets
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    # Get associated account
+    account = db.query(Account).filter(Account.id == run.account_id).first()
+
+    # Get tweets ordered by index
+    from app.db.dao import get_tweets_by_run
+
+    tweets = get_tweets_by_run(db, run_id)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="review.html",
+        context={
+            "run": run,
+            "account": account,
+            "tweets": tweets,
+        },
+    )
+
+
+@router.post("/review/{run_id}/tweet/{tweet_id}")
+async def update_tweet(
+    run_id: int,
+    tweet_id: int,
+    text: str = Form(...),
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """
+    Update tweet text (HTMX endpoint).
+
+    Args:
+        run_id: Run ID
+        tweet_id: Tweet ID to update
+        text: New tweet text
+        db: Database session
+
+    Returns:
+        Redirect to review page
+    """
+    tweet = db.query(Tweet).filter(Tweet.id == tweet_id, Tweet.run_id == run_id).first()
+    if not tweet:
+        raise HTTPException(status_code=404, detail="Tweet not found")
+
+    tweet.text = text
+    db.commit()
+
+    return RedirectResponse(url=f"/review/{run_id}", status_code=303)
+
+
+@router.post("/review/{run_id}/tweet/{tweet_id}/alt")
+async def update_alt_text(
+    run_id: int,
+    tweet_id: int,
+    media_alt: str = Form(...),
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """
+    Update tweet media alt text.
+
+    Args:
+        run_id: Run ID
+        tweet_id: Tweet ID to update
+        media_alt: New alt text
+        db: Database session
+
+    Returns:
+        Redirect to review page
+    """
+    tweet = db.query(Tweet).filter(Tweet.id == tweet_id, Tweet.run_id == run_id).first()
+    if not tweet:
+        raise HTTPException(status_code=404, detail="Tweet not found")
+
+    tweet.media_alt = media_alt
+    db.commit()
+
+    return RedirectResponse(url=f"/review/{run_id}", status_code=303)
+
+
+@router.post("/review/{run_id}/regenerate")
+async def regenerate_thread(
+    run_id: int,
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """
+    Regenerate entire thread with same settings.
+
+    Args:
+        run_id: Run ID to regenerate
+        db: Database session
+
+    Returns:
+        Redirect to review page with new content
+    """
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    try:
+        # Re-scrape content
+        scraped = scrape(run.url)
+
+        # Parse settings from JSON
+        settings = {}
+        if run.settings_json:
+            settings = json.loads(run.settings_json)
+
+        # Regenerate with same settings
+        generation_result = generate_thread(  # type: ignore[call-arg]
+            title=scraped.title,
+            content=scraped.text,
+            word_count=scraped.word_count,
+            style=settings.get("style", "punchy"),
+            summary_mode=settings.get("summary_mode", "extractive"),
+            max_tweets=settings.get("thread_cap", 12),
+            include_hook=settings.get("include_hook", True),
+        )
+
+        # Delete old tweets
+        db.query(Tweet).filter(Tweet.run_id == run_id).delete()
+
+        # Create new tweets
+        for idx, tweet_text in enumerate(generation_result.tweets):
+            create_tweet(
+                db,
+                TweetCreate(
+                    run_id=run_id,
+                    idx=idx,
+                    role="content",
+                    text=tweet_text,
+                ),
+            )
+
+        # Update run with new costs
+        run.tokens_in = generation_result.tokens_in
+        run.tokens_out = generation_result.tokens_out
+        run.cost_estimate = generation_result.cost_usd
+        db.commit()
+
+        return RedirectResponse(url=f"/review/{run_id}", status_code=303)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Regeneration failed: {e}") from e
+
+
+@router.post("/review/{run_id}/approve")
+async def approve_and_post(
+    run_id: int,
+    db: Session = Depends(get_db),
+) -> RedirectResponse:
+    """
+    Approve thread and post to X/Twitter.
+
+    Args:
+        run_id: Run ID to approve
+        db: Database session
+
+    Returns:
+        Redirect to history page
+    """
+    run = db.query(Run).filter(Run.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="Run not found")
+
+    # Update status to approved
+    run.status = "approved"
+    db.commit()
+
+    # TODO: Implement actual posting logic
+    # This will be part of Prompt 11 integration
+    # For now, just mark as approved
+
+    return RedirectResponse(url="/history", status_code=303)
