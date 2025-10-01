@@ -428,3 +428,16 @@ async def approve_and_post(
     # For now, just mark as approved
 
     return RedirectResponse(url="/history", status_code=303)
+
+
+@router.get("/history", response_class=HTMLResponse)
+async def history(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    """Display history of all runs."""
+    # Get all runs ordered by submission time (newest first)
+    runs = db.query(Run).order_by(Run.submitted_at.desc()).all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="history.html",
+        context={"runs": runs},
+    )

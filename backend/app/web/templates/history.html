@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}History - Threadify{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>History</h2>
+
+    {% if runs %}
+    <div class="history-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Title</th>
+                    <th>Account</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for run in runs %}
+                <tr class="history-row status-{{ run.status }}">
+                    <td class="time-cell">
+                        <span title="{{ run.submitted_at.strftime('%Y-%m-%d %H:%M:%S') if run.submitted_at else 'N/A' }}">
+                            {{ run.submitted_at.strftime('%b %d, %H:%M') if run.submitted_at else 'N/A' }}
+                        </span>
+                    </td>
+                    <td class="title-cell">
+                        <a href="{{ run.url }}" target="_blank" class="article-link">
+                            {% if run.scraped_title %}
+                                {{ run.scraped_title }}
+                            {% elif run.url and run.url|length > 50 %}
+                                {{ run.url[:50] + '...' }}
+                            {% else %}
+                                {{ run.url or 'Untitled' }}
+                            {% endif %}
+                        </a>
+                    </td>                    <td class="account-cell">
+                        @{{ run.account.handle if run.account else 'unknown' }}
+                    </td>
+                    <td class="type-cell">
+                        {{ run.type }}
+                    </td>
+                    <td class="status-cell">
+                        <span class="status-badge status-{{ run.status }}">
+                            {{ run.status }}
+                        </span>
+                    </td>
+                    <td class="cost-cell">
+                        ${{ "%.4f" | format(run.cost_estimate or 0) }}
+                    </td>
+                    <td class="actions-cell">
+                        {% if run.status in ['review', 'approved'] %}
+                            <a href="/review/{{ run.id }}" class="btn-link">Review</a>
+                        {% endif %}
+
+                        {% if run.status == 'completed' %}
+                            {% set tweets_with_ids = run.tweets | selectattr('posted_tweet_id') | list %}
+                            {% if tweets_with_ids %}
+                                <div class="tweet-links">
+                                    {% for tweet in tweets_with_ids[:1] %}
+                                        <a href="https://twitter.com/{{ run.account.handle }}/status/{{ tweet.posted_tweet_id }}"
+                                           target="_blank"
+                                           class="btn-link">
+                                            View Thread
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No runs yet. <a href="/">Create your first thread!</a></p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.history-table {
+    margin-top: 2rem;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #f5f8fa;
+}
+
+th {
+    text-align: left;
+    padding: 1rem;
+    font-weight: 600;
+    color: #657786;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 1rem;
+    border-top: 1px solid #e1e8ed;
+}
+
+.history-row:hover {
+    background-color: #f9f9f9;
+}
+
+.time-cell {
+    white-space: nowrap;
+    font-size: 0.875rem;
+    color: #657786;
+}
+
+.title-cell {
+    max-width: 300px;
+}
+
+.article-link {
+    color: #1da1f2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.article-link:hover {
+    text-decoration: underline;
+}
+
+.account-cell {
+    font-family: monospace;
+    color: #14171a;
+}
+
+.type-cell {
+    text-transform: capitalize;
+    font-size: 0.875rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-review,
+.status-approved {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-pending {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.cost-cell {
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #657786;
+}
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+.btn-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #1da1f2;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-link:hover {
+    background-color: #1a91da;
+}
+
+.tweet-links {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 2rem;
+}
+
+.empty-state p {
+    font-size: 1.125rem;
+    color: #657786;
+}
+
+.empty-state a {
+    color: #1da1f2;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.empty-state a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
