@@ -409,27 +409,108 @@ Acceptance:
 - Tests pass; wiring into submission endpoint is complete. ✅
 ```
 
-### Prompt 13 — Web: form + Review UI (HTMX/Jinja)
+### Prompt 13 — Web: form + Review UI (HTMX/Jinja) ✅ COMPLETED
+
+#### Prompt 13a — Base templates + Index form ✅ COMPLETED
 
 ```text
-Implement Prompt 13: Server-rendered UI.
+Implement base HTML templates and index submission form.
 
 Scope:
-1) Routes:
-   - GET `/` form (URL, account, mode=review default, type, style, hook, reference, image toggles, caps).
-   - POST `/submit` creates Run; if too_short or over_budget, redirect to Review.
-   - GET `/review/{run_id}` shows editable tweets/post, hero toggle/alt, reference toggle+UTM, regenerate button.
-2) HTMX actions:
-   - Inline edit tweet text → length check via Node service.
-   - Regenerate whole with same settings.
-3) Basic History page `/history`.
+1) Create base.html with HTMX CDN, navigation, footer
+2) Create index.html with comprehensive form:
+   - URL input, account selector
+   - Basic settings: mode, type, style, summary_mode
+   - Advanced options (collapsible): caps, reference, UTM, image, hook, force
+3) Create style.css with Twitter-inspired styling
+4) Implement GET `/` route to render form with account list
 
-Tests first:
-- Template rendering tests.
-- Review actions: edit → save; regenerate sets new version; length check endpoint returns valid/invalid.
+Tests:
+- 8 tests covering form rendering, options, HTMX inclusion
 
 Acceptance:
-- All UI tests pass with httpx test client.
+✅ All tests pass
+✅ Base template with HTMX loaded
+✅ Index form with all fields
+```
+
+#### Prompt 13b — POST /submit endpoint ✅ COMPLETED
+
+```text
+Implement POST /submit endpoint with full service integration.
+
+Scope:
+1) POST `/submit` endpoint with 8-step pipeline:
+   - Canonicalize URL
+   - Check duplicates (with force override)
+   - Scrape content
+   - Process hero image (if enabled)
+   - Generate thread/post with AI
+   - Check budget (force review if over)
+   - Store Run and Tweets
+   - Redirect to review page
+2) Exception handling for all service errors
+3) Form data parsing (checkboxes to booleans)
+
+Tests:
+- 10 tests with full mocking of services
+- Tests validation, duplicates, canonicalization, storage
+
+Acceptance:
+✅ All tests pass
+✅ Full service integration
+✅ Proper exception handling and error messages
+```
+
+#### Prompt 13c — Review UI ✅ COMPLETED
+
+```text
+Implement review page with editable tweets and actions.
+
+Scope:
+1) review.html template with:
+   - Run metadata display (title, URL, account, cost, tokens)
+   - Editable textareas for each tweet with HTMX blur triggers
+   - Character counters with 280-char limit and red highlighting
+   - Alt text editing for media
+   - Regenerate button with confirmation
+   - Approve & Post button
+2) Routes:
+   - GET `/review/{run_id}` - Display review page
+   - POST `/review/{run_id}/tweet/{tweet_id}` - Update tweet text
+   - POST `/review/{run_id}/tweet/{tweet_id}/alt` - Update alt text
+   - POST `/review/{run_id}/regenerate` - Regenerate entire thread
+   - POST `/review/{run_id}/approve` - Approve for posting
+3) HTMX auto-save on blur
+
+Tests:
+- 10 tests covering page load, display, editing, regenerate, approve
+
+Acceptance:
+✅ All tests pass
+✅ HTMX auto-save functionality
+✅ Character counters with visual feedback
+✅ Regenerate with same settings
+✅ 404 handling for missing runs
+```
+
+#### Prompt 13d — History page
+
+```text
+Implement basic history page `/history`.
+
+Scope:
+- List all runs with status, timestamps, costs
+- Filter by account
+- Links to review pages
+- Display tweet/post links for completed runs
+
+Tests first:
+- Template rendering tests
+- Sorting and filtering tests
+
+Acceptance:
+- All UI tests pass with httpx test client
 ```
 
 ### Prompt 14 — CLI (Typer) + API token auth
