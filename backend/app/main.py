@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
+from app.api.routes import router as api_router
 from app.config import get_settings
 from app.web.oauth_routes import router as oauth_router
 from app.web.routes import router as web_router
@@ -27,6 +28,7 @@ app.mount("/static", StaticFiles(directory="backend/app/web/static"), name="stat
 # Include routers
 app.include_router(oauth_router)
 app.include_router(web_router)
+app.include_router(api_router)
 
 
 @app.get("/healthz")
